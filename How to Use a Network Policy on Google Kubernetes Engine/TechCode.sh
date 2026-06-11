@@ -1,0 +1,152 @@
+#!/bin/bash
+
+BLACK_TEXT=$'\033[0;90m'
+RED_TEXT=$'\033[0;91m'
+GREEN_TEXT=$'\033[0;92m'
+YELLOW_TEXT=$'\033[0;93m'
+BLUE_TEXT=$'\033[0;94m'
+MAGENTA_TEXT=$'\033[0;95m'
+CYAN_TEXT=$'\033[0;96m'
+WHITE_TEXT=$'\033[0;97m'
+
+RESET_FORMAT=$'\033[0m'
+
+BOLD_TEXT=$'\033[1m'
+UNDERLINE_TEXT=$'\033[4m'
+
+clear
+
+echo "${CYAN_TEXT}${BOLD_TEXT}==================================================================${RESET_FORMAT}"
+echo "${CYAN_TEXT}${BOLD_TEXT}      SUBSCRIBE TECH & CODE - INITIATING EXECUTION...            ${RESET_FORMAT}"
+echo "${CYAN_TEXT}${BOLD_TEXT}==================================================================${RESET_FORMAT}"
+echo
+
+echo "${BLUE_TEXT}${BOLD_TEXT}Fetching Project Configuration...${RESET_FORMAT}"
+echo
+
+gcloud config set project $(gcloud projects list \
+  --format='value(PROJECT_ID)' \
+  --filter='qwiklabs-gcp')
+
+export PROJECT_ID=$(gcloud config get-value project)
+
+export REGION=$(gcloud compute project-info describe \
+  --format="value(commonInstanceMetadata.items[google-compute-default-region])")
+
+export ZONE=$(gcloud compute project-info describe \
+  --format="value(commonInstanceMetadata.items[google-compute-default-zone])")
+
+gcloud config set compute/region "$REGION"
+gcloud config set compute/zone "$ZONE"
+
+echo "${GREEN_TEXT}Project ID : ${PROJECT_ID}${RESET_FORMAT}"
+echo "${GREEN_TEXT}Region     : ${REGION}${RESET_FORMAT}"
+echo "${GREEN_TEXT}Zone       : ${ZONE}${RESET_FORMAT}"
+echo
+
+echo "${BLUE_TEXT}${BOLD_TEXT}Downloading Lab Resources...${RESET_FORMAT}"
+echo
+
+rm -rf ~/gke-network-policy-demo
+
+gsutil cp -r gs://spls/gsp480/gke-network-policy-demo ~
+
+cd ~/gke-network-policy-demo || exit 1
+
+chmod -R 755 *
+
+echo
+echo "${GREEN_TEXT}Lab files downloaded successfully.${RESET_FORMAT}"
+echo
+
+echo "${YELLOW_TEXT}${BOLD_TEXT}Setting Up Project APIs & Terraform Variables...${RESET_FORMAT}"
+echo
+
+printf "y\n" | make setup-project
+
+echo
+echo "${YELLOW_TEXT}Waiting for APIs to finish enabling...${RESET_FORMAT}"
+sleep 180
+
+echo
+echo "${GREEN_TEXT}Project setup completed.${RESET_FORMAT}"
+echo
+
+echo "${MAGENTA_TEXT}${BOLD_TEXT}Provisioning Infrastructure using Terraform...${RESET_FORMAT}"
+echo "${YELLOW_TEXT}This process may take several minutes...${RESET_FORMAT}"
+echo
+
+cd terraform || exit 1
+
+terraform init
+
+terraform apply -auto-approve
+
+cd ..
+
+echo
+echo "${GREEN_TEXT}${BOLD_TEXT}Copying Lab Files to Bastion VM...${RESET_FORMAT}"
+echo
+
+gcloud compute scp --recurse ~/gke-network-policy-demo \
+gke-demo-bastion:~ --zone "$ZONE"
+
+echo
+echo "${GREEN_TEXT}${BOLD_TEXT}Connecting to Bastion VM...${RESET_FORMAT}"
+echo
+
+gcloud compute ssh gke-demo-bastion --zone "$ZONE" << EOF
+
+export ZONE=\$(gcloud config get-value compute/zone)
+
+cd ~/gke-network-policy-demo || exit 1
+
+sudo apt-get update
+
+sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+
+echo "export USE_GKE_GCLOUD_AUTH_PLUGIN=True" >> ~/.bashrc
+
+source ~/.bashrc
+
+gcloud container clusters get-credentials gke-demo-cluster --zone "\$ZONE"
+
+kubectl apply -f ./manifests/hello-app/
+
+kubectl get pods
+
+timeout 10 kubectl logs --tail 10 -f \$(kubectl get pods -oname -l app=hello)
+
+timeout 10 kubectl logs --tail 10 -f \$(kubectl get pods -oname -l app=not-hello)
+
+kubectl apply -f ./manifests/network-policy.yaml
+
+timeout 10 kubectl logs --tail 10 -f \$(kubectl get pods -oname -l app=not-hello)
+
+kubectl delete -f ./manifests/network-policy.yaml
+
+kubectl create -f ./manifests/network-policy-namespaced.yaml
+
+timeout 10 kubectl logs --tail 10 -f \$(kubectl get pods -oname -l app=hello)
+
+kubectl -n hello-apps apply -f ./manifests/hello-app/hello-client.yaml
+
+timeout 10 kubectl logs --tail 10 -f -n hello-apps \
+\$(kubectl get pods -oname -l app=hello -n hello-apps)
+
+exit
+EOF
+
+echo
+echo "${CYAN_TEXT}${BOLD_TEXT}=======================================================${RESET_FORMAT}"
+echo "${CYAN_TEXT}${BOLD_TEXT}              LAB COMPLETED SUCCESSFULLY!              ${RESET_FORMAT}"
+echo "${CYAN_TEXT}${BOLD_TEXT}=======================================================${RESET_FORMAT}"
+echo
+
+echo "${RED_TEXT}${BOLD_TEXT}${UNDERLINE_TEXT}https://www.youtube.com/@TechCode9${RESET_FORMAT}"
+echo "${GREEN_TEXT}${BOLD_TEXT}Don't forget to Like, Share & Subscribe${RESET_FORMAT}"
+echo
+
+echo "${YELLOW_TEXT}${BOLD_TEXT}Cleaning up temporary script...${RESET_FORMAT}"
+
+rm -f TechCode.sh

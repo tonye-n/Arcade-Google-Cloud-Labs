@@ -27,8 +27,14 @@ echo
 
 gcloud auth list
 
+read -p "Enter Zone: " ZONE
+export REGION=${ZONE%-*}
+
+gcloud config set compute/zone $ZONE
+gcloud config set compute/region $REGION
+
   gcloud compute instances create www1 \
-    --zone=$zone \
+    --zone=$ZONE \
     --tags=network-lb-tag \
     --machine-type=e2-small \
     --image-family=debian-11 \
@@ -41,7 +47,7 @@ gcloud auth list
 <h3>Web Server: www1</h3>" | tee /var/www/html/index.html'
 
   gcloud compute instances create www2 \
-    --zone=$zone \
+    --zone=$ZONE \
     --tags=network-lb-tag \
     --machine-type=e2-small \
     --image-family=debian-11 \
@@ -54,7 +60,7 @@ gcloud auth list
 <h3>Web Server: www2</h3>" | tee /var/www/html/index.html'
 
   gcloud compute instances create www3 \
-    --zone=$zone  \
+    --zone=$ZONE  \
     --tags=network-lb-tag \
     --machine-type=e2-small \
     --image-family=debian-11 \
@@ -72,7 +78,7 @@ gcloud compute firewall-rules create www-firewall-network-lb \
     gcloud compute instances list
 
     gcloud compute instance-templates create lb-backend-template \
-   --region=$region \
+   --region=$REGION \
    --network=default \
    --subnet=default \
    --tags=allow-health-check \
@@ -92,7 +98,10 @@ gcloud compute firewall-rules create www-firewall-network-lb \
 
 
      gcloud compute instance-groups managed create lb-backend-group \
-   --template=lb-backend-template --size=2 --zone=$zone
+   --template=lb-backend-template --size=2 --zone=$ZONE
+
+   echo "Waiting for managed instances to start..."
+sleep 60
 
    gcloud compute firewall-rules create fw-allow-health-check \
   --network=default \
@@ -123,7 +132,7 @@ gcloud compute firewall-rules create www-firewall-network-lb \
 
   gcloud compute backend-services add-backend web-backend-service \
   --instance-group=lb-backend-group \
-  --instance-group-zone=$zone \
+  --instance-group-zone=$ZONE \
   --global
 
   gcloud compute url-maps create web-map-http \
@@ -133,7 +142,7 @@ gcloud compute firewall-rules create www-firewall-network-lb \
     --url-map web-map-http
 
     gcloud compute forwarding-rules create http-content-rule \
-   --address=lb-ipv4-1\
+   --address=lb-ipv4-1 \
    --global \
    --target-http-proxy=http-lb-proxy \
    --ports=80

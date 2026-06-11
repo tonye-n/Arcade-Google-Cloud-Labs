@@ -30,7 +30,8 @@ echo
 
 gcloud auth list
 
-export PROJECT_ID=$DEVSHELL_PROJECT_ID
+PROJECT_ID=$(gcloud config get-value project)
+echo "${GREEN_TEXT}${BOLD_TEXT}Project: $PROJECT_ID${RESET_FORMAT}"
 
 cat > inspect-request.json <<EOF_CP
 {
@@ -55,7 +56,7 @@ cat > inspect-request.json <<EOF_CP
 }
 EOF_CP
 
-ACCESS_TOKEN=$(gcloud auth application-default print-access-token)
+ACCESS_TOKEN=$(gcloud auth print-access-token)
 
 curl -s \
   -H "Authorization: Bearer $ACCESS_TOKEN" \

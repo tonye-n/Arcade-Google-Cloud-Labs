@@ -1,34 +1,23 @@
 #!/bin/bash
-BLACK_TEXT=$'\033[0;90m'
+
 RED_TEXT=$'\033[0;91m'
 GREEN_TEXT=$'\033[0;92m'
 YELLOW_TEXT=$'\033[0;93m'
-BLUE_TEXT=$'\033[0;94m'
-MAGENTA_TEXT=$'\033[0;95m'
 CYAN_TEXT=$'\033[0;96m'
-WHITE_TEXT=$'\033[0;97m'
-TEAL_TEXT=$'\033[38;5;50m'
-PURPLE_TEXT=$'\033[0;35m'
-GOLD_TEXT=$'\033[0;33m'
-LIME_TEXT=$'\033[0;92m'
-MAROON_TEXT=$'\033[0;91m'
-NAVY_TEXT=$'\033[0;94m'
+BLUE_TEXT=$'\033[0;94m'
 
 BOLD_TEXT=$'\033[1m'
-UNDERLINE_TEXT=$'\033[4m'
-BLINK_TEXT=$'\033[5m'
-NO_COLOR=$'\033[0m'
 RESET_FORMAT=$'\033[0m'
-REVERSE_TEXT=$'\033[7m'
+UNDERLINE_TEXT=$'\033[4m'
 
 clear
-# Welcome message
+
 echo "${CYAN_TEXT}${BOLD_TEXT}==================================================================${RESET_FORMAT}"
-echo "${CYAN_TEXT}${BOLD_TEXT}      SUBSCRIBE TECH & CODE- INITIATING EXECUTION...  ${RESET_FORMAT}"
+echo "${CYAN_TEXT}${BOLD_TEXT}          SUBSCRIBE TECH & CODE - INITIATING EXECUTION...         ${RESET_FORMAT}"
 echo "${CYAN_TEXT}${BOLD_TEXT}==================================================================${RESET_FORMAT}"
 echo
 
-# ✅ Added user input section (no existing line changed)
+
 echo "${YELLOW_TEXT}${BOLD_TEXT}Enter required details:${RESET_FORMAT}"
 read -p "Enter USER_2 (email): " USER_2
 read -p "Enter ZONE (e.g. us-central1-a): " ZONE
@@ -225,6 +214,7 @@ gcloud projects remove-iam-policy-binding $DEVSHELL_PROJECT_ID \
 --member=user:$USER_2 \
 --role=roles/viewer
 
+# Final message
 echo
 echo "${CYAN_TEXT}${BOLD_TEXT}=======================================================${RESET_FORMAT}"
 echo "${CYAN_TEXT}${BOLD_TEXT}              LAB COMPLETED SUCCESSFULLY!              ${RESET_FORMAT}"
@@ -232,3 +222,4 @@ echo "${CYAN_TEXT}${BOLD_TEXT}==================================================
 echo
 echo "${RED_TEXT}${BOLD_TEXT}${UNDERLINE_TEXT}https://www.youtube.com/@TechCode9${RESET_FORMAT}"
 echo "${GREEN_TEXT}${BOLD_TEXT}Don't forget to Like, Share and Subscribe for more Videos${RESET_FORMAT}"
+echo

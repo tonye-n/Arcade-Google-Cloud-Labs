@@ -33,7 +33,10 @@ Participants can also earn exciting swags by completing selected Google Cloud la
 ## ⚠️ Disclaimer
 
 > **Google Cloud** may update/remove badges, labs, or assessment paths anytime.  
-> **Respect the work, don’t copy-paste without giving credit — it takes hours of research.**
+> **Respect the work, don’t copy-paste without giving credit — it takes hours of research.**<br>
+> Copyright © 2025–2026 Prateek Rajput (Tech & Code)<br>
+> All Rights Reserved.<br>
+> No permission is granted to copy, redistribute, re-upload, modify, or use this code in YouTube videos, repositories, websites, courses, or other content without explicit written permission from the copyright owner.
 
 ## 💫 If you find this useful...
 
@@ -45,4 +48,4 @@ Participants can also earn exciting swags by completing selected Google Cloud la
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Prateek%20Rajput-blue?logo=linkedin)](https://www.linkedin.com/in/prateekrajput08)
 [![GitHub](https://img.shields.io/badge/GitHub-Prateek%20Rajput-black?logo=github)](https://github.com/prateekrajput08)
 [![YouTube](https://img.shields.io/badge/YouTube-Tech%20&%20Code-red?logo=youtube)](https://www.youtube.com/@TechCode9/playlists)
-[![Live](https://img.shields.io/badge/Live-ArcadeCalci-success?logo=vercel)](https://arcadecalci.vercel.app)
+[![Live](https://img.shields.io/badge/Live-ArcadePointsCalci-success?logo=vercel)](https://arcadepointscalci.in)
